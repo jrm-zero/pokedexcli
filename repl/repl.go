@@ -1,6 +1,8 @@
 package repl
 
+import "strings"
+
 func cleanInput(text string) []string {
-	var cleanedInput []string
+	cleanedInput := strings.Fields(text)
 	return cleanedInput
 }
