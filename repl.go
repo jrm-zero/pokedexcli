@@ -1,8 +1,8 @@
-package repl
+package main
 
 import "strings"
 
 func cleanInput(text string) []string {
-	cleanedInput := strings.Fields(text)
+	cleanedInput := strings.Fields(strings.ToLower(text))
 	return cleanedInput
 }

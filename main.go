@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"bufio"
-	"repl"
+	"os"
 )
 
 func main() {
@@ -11,8 +11,9 @@ func main() {
 
 	for ;; {
 		fmt.Print("Pokedex >")
-		input := Scanner.Text(Scanner.Scan(scanner))
-		cleanedInput := repl.cleanInput(input)
+		scanner.Scan()
+		input := scanner.Text()
+		cleanedInput := cleanInput(input)
 		fmt.Printf("Your command was: %s\n", cleanedInput[0])
 	}
 }
