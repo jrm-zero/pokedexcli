@@ -13,9 +13,14 @@ func startRepl(config *config) {
 	for {
 		fmt.Print("Pokedex >")
 		scanner.Scan()
-		input := scanner.Text()
-		cleanedInput := cleanInput(input)
-		command, exists := getcommands()[cleanedInput[0]]
+
+		cleanedInput := cleanInput(scanner.Text())
+		if len(cleanedInput) == 0 {
+			fmt.Println("Type something next time, huh?")
+			continue
+		}
+
+		command, exists := config.commands[cleanedInput[0]]
 
 		if exists {
 			err := command.callback(config)

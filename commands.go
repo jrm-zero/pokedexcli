@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"github.com/jrm-zero/pokedexcli/internal/pokeapicontrols"
 )
 
 func commandExit(config *config) error {
@@ -16,9 +17,15 @@ func commandHelp(config *config) error {
 	fmt.Println("Usage:")
 	fmt.Println("")
 	
-	for _, command := range getcommands() {
+	for _, command := range config.commands {
 		fmt.Printf("%s: %s\n", command.name, command.description)
 	}
 
+	return nil
+}
+
+func commandMap(config *config) error {
+	retreiveLocations(string(config.locationsOffset))
+	config.locationsOffset += 20
 	return nil
 }

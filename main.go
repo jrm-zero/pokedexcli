@@ -1,9 +1,9 @@
 package main
 
 func main() {
-	myconfig := config{
+	myConfigPtr := &config{
 		commands: getcommands(),
+		locationsOffset: 0,
 	}
-	myConfigPtr := &myconfig
 	startRepl(myConfigPtr)
 }
