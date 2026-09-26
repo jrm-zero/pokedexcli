@@ -6,79 +6,45 @@ import (
 	"net/http"
 )
 
-type Name struct {
-	name	string
-	language	NamedAPIResource
+type LocationAreaBatch struct {
+	Count    int    `json:"count,omitempty"`
+	Next     string `json:"next,omitempty"`
+	Previous string    `json:"previous,omitempty"`
+	Results  []struct {
+		Name string `json:"name,omitempty"`
+		URL  string `json:"url,omitempty"`
+	} `json:"results,omitempty"`
 }
 
-type NamedAPIResource struct {
-	name	string
-	url		string
-}
-
-type EncounterMethodRate struct {
-	encounter_method	NamedAPIResource
-	version_details		EncounterVersionDetails
-}
-
-type EncounterVersionDetails struct {
-	rate	int
-	version		NamedAPIResource
-}
-
-type VersionEncounterDetail struct {
-	version	NamedAPIResource
-	max_chance	int
-	encounter_details	Encounter
-}
-
-type Encounter struct {
-	min_level	int
-	max_level	int
-	condition_values	NamedAPIResource
-	chance	int
-	method	NamedAPIResource
-}
-
-type PokemonEncounter struct {
-	pokemon	NamedAPIResource
-	version_details	VersionEncounterDetail
-}
-type Location struct {
-	id	int `json:"id"`
-	name	string	`json:"name"`
-	game_index	int	`json:"game_index"`
-	encounter_method_rates	EncounterMethodRate	`json:"encounter_method_rates"`
-	location	NamedAPIResource	`"json:"location"`
-	names	Name	`json:"names"`
-	pokemon_encounters	PokemonEncounter	`json:"pokemon_encounters"`
-}
-
-func retreiveLocations(locationsOffset string) error {
-	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%s", locationsOffset)
+func RetreiveLocations(url string, page_direction int) (string, error) {
 	res, err := http.Get(url)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer res.Body.Close()
 
 	locations, err := decodeJSONResponse(res)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	for _, location := range locations {
-		fmt.Println(location.name)
+	for _, location := range locations.Results {
+		fmt.Println(location.Name)
 	}
-
-	return nil
+	
+	if page_direction == 1 {
+		return locations.Next, nil
+	}
+	
+	return locations.Previous, nil
 }
 
-func decodeJSONResponse(res *http.Response) ([]Location, error) {
-	var locations []Location
+func decodeJSONResponse(res *http.Response) (LocationAreaBatch, error) {
+	var locations LocationAreaBatch
 	decoder := json.NewDecoder(res.Body)
 	if err := decoder.Decode(&locations); err != nil {
-		return nil, err
+		return LocationAreaBatch{}, err
 	}
+	
 	return locations, nil
 }

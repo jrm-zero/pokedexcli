@@ -25,7 +25,21 @@ func commandHelp(config *config) error {
 }
 
 func commandMap(config *config) error {
-	retreiveLocations(string(config.locationsOffset))
-	config.locationsOffset += 20
+	next_url, err := pokeapicontrols.RetreiveLocations(config.next_page, 1)
+	if err != nil {
+		return err
+	}
+	config.previous_page = config.next_page
+	config.next_page = next_url
+	return nil
+}
+
+func commandMapb(config *config) error {
+	previous_url, err := pokeapicontrols.RetreiveLocations(config.previous_page, 0)
+	if err != nil {
+		return err
+	}
+	config.next_page = config.previous_page
+	config.previous_page = previous_url
 	return nil
 }

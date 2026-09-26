@@ -2,7 +2,8 @@ package main
 
 type config struct {
 	commands	map[string]cliCommand
-	locationsOffset	int
+	next_page	string
+	previous_page	string
 }
 
 func getcommands() map[string]cliCommand {
@@ -21,6 +22,11 @@ func getcommands() map[string]cliCommand {
 			name:	"map",
 			description:	"Displays next 20 pages",
 			callback:	commandMap,
+		},
+		"mapb": {
+			name:	"mapb",
+			description:	"Displays previous 20 pages",
+			callback:	commandMapb,
 		},
 	}
 }
