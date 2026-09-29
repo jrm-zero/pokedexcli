@@ -9,7 +9,7 @@ func main() {
 		commands: getcommands(),
 		next_page: "https://pokeapi.co/api/v2/location-area",
 		previous_page: "",
-		cache: newCache(5 * time.Second),
+		cache: NewCache(5 * time.Second),
 	}
 	startRepl(myConfigPtr)
 }
