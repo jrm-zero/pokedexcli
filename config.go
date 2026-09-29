@@ -1,9 +1,12 @@
 package main
 
+import "github.com/jrm-zero/pokedexcli/internal/pokecache"
+
 type config struct {
 	commands	map[string]cliCommand
 	next_page	string
 	previous_page	string
+	cache Cache
 }
 
 func getcommands() map[string]cliCommand {
