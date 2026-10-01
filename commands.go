@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"github.com/jrm-zero/pokedexcli/internal/pokeapicontrols"
-	"github.com/jrm-zero/pokedexcli/internal/pokecache"
 )
 
 func commandExit(config *config) error {
@@ -26,49 +25,31 @@ func commandHelp(config *config) error {
 }
 
 func commandMap(config *config) error {
-	res, exists := config.cache[config.next_page]
-	if !exists {
-		err := pokeapicontrols.GetLocations(config.next_page)
-		if err != nil {
-			return err
-		}
-		config.cache[config.next_page]
-	}
-
-	locations, err := decodeJSONResponse(res)
+	locations, next_url, err := pokeapicontrols.GetLocations(config.next_page, 1)
 	if err != nil {
 		return err
 	}
 
-	for _, location := range locations.Results {
-		fmt.Println(location.Name)
+	for _, location := range locations {
+		fmt.Println(location)
 	}
 	
 	config.previous_page = config.next_page
-	config.next_page = locations.Next
+	config.next_page = next_url
 	return nil
 }
 
 func commandMapb(config *config) error {
-	res, exists := config.cache[config.previous_page]
-	if !exists {
-		previous_url, err := pokeapicontrols.GetLocations(config.previous_page)
-		if err != nil {
-			return err
-		}
-		config.cache[config.previous_page]
-	}
-
-	locations, err := decodeJSONResponse(res)
+	locations, previous_url, err := pokeapicontrols.GetLocations(config.previous_page, 0)
 	if err != nil {
 		return err
 	}
 
-	for _, location := range locations.Results {
-		fmt.Println(location.Name)
+	for _, location := range locations {
+		fmt.Println(location)
 	}
 	
 	config.next_page = config.previous_page
-	config.previous_page = locations.Previous
+	config.previous_page = previous_url
 	return nil
 }

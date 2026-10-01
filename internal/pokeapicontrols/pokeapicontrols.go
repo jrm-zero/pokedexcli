@@ -3,6 +3,8 @@ package pokeapicontrols
 import (
 	"encoding/json"
 	"net/http"
+	"time"
+	"github.com/jrm-zero/pokedexcli/internal/pokecache"
 )
 
 type LocationAreaBatch struct {
@@ -15,15 +17,31 @@ type LocationAreaBatch struct {
 	} `json:"results,omitempty"`
 }
 
-func GetLocations(url string) (*http.Response, error) {
+func GetLocations(url string, page_direction int) ([]string, string, error) {
+	cache := NewCache(5 * time.Second)
 	res, err := http.Get(url)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer res.Body.Close()
+	cache.Add(url, res)
+	res_decoded, err := decodeJSONResponse(res)
+	if err != nil {
+		return nil, "", err
+	}
 
-	return res, nil
+	var locations []string
+	for _, location_result := range res_decoded.Results {
+		locations = append(locations, location_result.Name)
+	}
+
+	if page_direction == 1 {
+		return locations, res_decoded.Next, nil
+	}
+	
+	return locations, res_decoded.Previous, nil
 }
+
 
 func decodeJSONResponse(res *http.Response) (LocationAreaBatch, error) {
 	var locations LocationAreaBatch
