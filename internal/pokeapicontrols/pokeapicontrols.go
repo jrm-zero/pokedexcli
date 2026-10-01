@@ -3,7 +3,7 @@ package pokeapicontrols
 import (
 	"encoding/json"
 	"net/http"
-	"fmt"
+	//"fmt"
 	"time"
 	"io"
 	"github.com/jrm-zero/pokedexcli/internal/pokecache"
@@ -20,25 +20,26 @@ type LocationAreaBatch struct {
 }
 
 func GetLocations(url string, page_direction int, c *pokecache.Cache) ([]string, string, error) {
-	body, exists := c.Cache[url]
+	_, exists := c.Cache[url]
 	if !exists {
-		fmt.Println(c.Cache[url])
+		
 		res, err := http.Get(url)
 		if err != nil {
 			return nil, "", err
 		}
 		defer res.Body.Close()
-
-		body, err := io.ReadAll(res.Body)
+		
+		newVal, err := io.ReadAll(res.Body)
 		if err != nil {
 			return nil, "", err
 		}
-
+		
 		c.Cache[url] = pokecache.CacheEntry {
 			CreatedAt: time.Now(),
-			Val: body,
+			Val: newVal,
 		}
 	}
+	body := c.Cache[url]
 	
 	res_decoded, err := decodeJSONResponse(body.Val)
 	if err != nil {
