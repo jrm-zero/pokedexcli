@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"github.com/jrm-zero/pokedexcli/internal/pokeapicontrols"
+	//"github.com/jrm-zero/pokedexcli/internal/pokecache"
 )
 
 func commandExit(config *config) error {
@@ -25,7 +26,7 @@ func commandHelp(config *config) error {
 }
 
 func commandMap(config *config) error {
-	locations, next_url, err := pokeapicontrols.GetLocations(config.next_page, 1)
+	locations, next_url, err := pokeapicontrols.GetLocations(config.next_page, 1, &config.Cache)
 	if err != nil {
 		return err
 	}
@@ -40,7 +41,7 @@ func commandMap(config *config) error {
 }
 
 func commandMapb(config *config) error {
-	locations, previous_url, err := pokeapicontrols.GetLocations(config.previous_page, 0)
+	locations, previous_url, err := pokeapicontrols.GetLocations(config.previous_page, 0, &config.Cache)
 	if err != nil {
 		return err
 	}

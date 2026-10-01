@@ -1,15 +1,15 @@
 package main
 
-import "time"
+import (
+	//"time"
+	"github.com/jrm-zero/pokedexcli/internal/pokecache"
+)
 
 type config struct {
 	commands	map[string]cliCommand
 	next_page	string
 	previous_page	string
-	cache map[string]struct {
-		createdAt time.Time
-		val []byte
-	}
+	Cache pokecache.Cache
 }
 
 func getcommands() map[string]cliCommand {

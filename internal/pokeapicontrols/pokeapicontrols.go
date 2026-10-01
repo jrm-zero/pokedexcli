@@ -3,7 +3,9 @@ package pokeapicontrols
 import (
 	"encoding/json"
 	"net/http"
+	"fmt"
 	"time"
+	"io"
 	"github.com/jrm-zero/pokedexcli/internal/pokecache"
 )
 
@@ -17,36 +19,48 @@ type LocationAreaBatch struct {
 	} `json:"results,omitempty"`
 }
 
-func GetLocations(url string, page_direction int) ([]string, string, error) {
-	cache := NewCache(5 * time.Second)
-	res, err := http.Get(url)
-	if err != nil {
-		return nil, "", err
-	}
-	defer res.Body.Close()
-	cache.Add(url, res)
-	res_decoded, err := decodeJSONResponse(res)
-	if err != nil {
-		return nil, "", err
-	}
+func GetLocations(url string, page_direction int, c *pokecache.Cache) ([]string, string, error) {
+	body, exists := c.Cache[url]
+	if !exists {
+		fmt.Println(c.Cache[url])
+		res, err := http.Get(url)
+		if err != nil {
+			return nil, "", err
+		}
+		defer res.Body.Close()
 
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			return nil, "", err
+		}
+
+		c.Cache[url] = pokecache.CacheEntry {
+			CreatedAt: time.Now(),
+			Val: body,
+		}
+	}
+	
+	res_decoded, err := decodeJSONResponse(body.Val)
+	if err != nil {
+		return nil, "", err
+	}
+	
 	var locations []string
 	for _, location_result := range res_decoded.Results {
 		locations = append(locations, location_result.Name)
 	}
-
+	
 	if page_direction == 1 {
 		return locations, res_decoded.Next, nil
 	}
-	
+
 	return locations, res_decoded.Previous, nil
 }
 
 
-func decodeJSONResponse(res *http.Response) (LocationAreaBatch, error) {
+func decodeJSONResponse(jsondata []byte) (LocationAreaBatch, error) {
 	var locations LocationAreaBatch
-	decoder := json.NewDecoder(res.Body)
-	if err := decoder.Decode(&locations); err != nil {
+	if err := json.Unmarshal(jsondata, &locations); err != nil {
 		return LocationAreaBatch{}, err
 	}
 	
