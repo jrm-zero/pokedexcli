@@ -41,7 +41,7 @@ func GetLocations(url string, page_direction int, c *pokecache.Cache) ([]string,
 	}
 	body := c.Cache[url]
 	
-	res_decoded, err := decodeJSONResponse(body.Val)
+	res_decoded, err := decodeJSONResponseLocationAreaBatch(body.Val)
 	if err != nil {
 		return nil, "", err
 	}
@@ -58,8 +58,7 @@ func GetLocations(url string, page_direction int, c *pokecache.Cache) ([]string,
 	return locations, res_decoded.Previous, nil
 }
 
-
-func decodeJSONResponse(jsondata []byte) (LocationAreaBatch, error) {
+func decodeJSONResponseLocationAreaBatch(jsondata []byte) (LocationAreaBatch, error) {
 	var locations LocationAreaBatch
 	if err := json.Unmarshal(jsondata, &locations); err != nil {
 		return LocationAreaBatch{}, err

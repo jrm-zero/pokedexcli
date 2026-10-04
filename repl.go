@@ -23,10 +23,10 @@ func startRepl(config *config) {
 		command, exists := config.commands[cleanedInput[0]]
 
 		if exists {
-			err := command.callback(config)
+			err := command.callback(config, cleanedInput[1:]...)
 			if err != nil {
-				fmt.Println(err)
-			}
+			fmt.Println(err)
+			}	
 			continue
 		} else {
 			fmt.Println("Unknown command")
@@ -43,6 +43,6 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name	string
 	description	string
-	callback	func(config *config) error
+	callback	func(config *config, arguments ...string) error
 }
 

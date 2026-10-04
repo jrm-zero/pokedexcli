@@ -3,12 +3,13 @@ package pokecache
 import (
 	"time"
 	"sync"
+	//"fmt"
 )
 
 type Cache struct {
 	Cache map[string]CacheEntry
 	interval time.Duration
-	mu sync.Mutex
+	mu *sync.Mutex
 }
 
 
@@ -22,7 +23,9 @@ func NewCache(interval time.Duration) Cache {
 	newCache := Cache{
 		Cache: m,
 		interval: interval,
+		mu: &sync.Mutex{},
 	}
+	go newCache.reapLoop()
 	return newCache
 }
 
@@ -39,19 +42,14 @@ func (c Cache) Get(key string) ([]byte, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	ce, exists := c.Cache[key]
-	if exists {
-		return ce.Val, true
-	} else {
-		return nil, false
-	}
+	return ce.Val, exists
 }
 
 func (c Cache) reapLoop() {
 	ticker := time.NewTicker(c.interval)
+	
 	defer ticker.Stop()
-	for {
-		select {
-			case <-ticker.C:
+	for range ticker.C {
 				c.mu.Lock()
 				for key, ce := range c.Cache {
 					t1 := time.Now()
@@ -60,8 +58,5 @@ func (c Cache) reapLoop() {
 					}
 				}
 				c.mu.Unlock()
-			default:
-				continue
-		}
 	}
 }
