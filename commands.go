@@ -5,6 +5,7 @@ import (
 	"os"
 	"github.com/jrm-zero/pokedexcli/internal/pokeapicontrols"
 	"errors"
+	"math/rand"
 	//"github.com/jrm-zero/pokedexcli/internal/pokecache"
 )
 
@@ -85,4 +86,35 @@ func commandExplore(config *config, arguments ...string) error {
 	}
 
 	return nil
+}
+
+func commandCatch(config *config, arguments ...string) error {
+	if len(arguments) != 1 {
+		return errors.New("Command catch takes one argument 'catch <pokemon name>")
+	}
+	fullURL := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s/", arguments[0])
+	pokemon, err := pokeapicontrols.GetPokemon(fullURL, &config.Cache)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Throwing a Pokeball at %s...\n", arguments[0])
+	caught := catchOutcome(pokemon.BaseExperience)
+	if caught {
+		fmt.Printf("%s was caught!\n", arguments[0])
+		config.Pokedex[arguments[0]] = pokemon
+		return nil
+	} 
+
+	fmt.Printf("%s escaped!\n", arguments[0])
+	return nil
+}
+
+func catchOutcome(baseExperience int) bool {
+	t := rand.Intn(400)
+	if t < baseExperience {
+		return false
+	}
+
+	return true
 }

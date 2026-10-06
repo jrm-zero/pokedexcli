@@ -3,6 +3,7 @@ package main
 import (
 	//"time"
 	"github.com/jrm-zero/pokedexcli/internal/pokecache"
+	"github.com/jrm-zero/pokedexcli/internal/pokeapicontrols"
 )
 
 type config struct {
@@ -10,6 +11,7 @@ type config struct {
 	next_page	string
 	previous_page	string
 	Cache pokecache.Cache
+	Pokedex map[string]pokeapicontrols.Pokemon
 }
 
 func getcommands() map[string]cliCommand {
@@ -38,6 +40,11 @@ func getcommands() map[string]cliCommand {
 			name: "explore",
 			description: "Shows pokemon within a specified area location 'explore <location name>'",
 			callback: commandExplore,
+		},
+		"catch": {
+			name: "catch",
+			description: "Attempts to catch pokemon specified 'catch <pokemon name>",
+			callback: commandCatch,
 		},
 	}
 }
