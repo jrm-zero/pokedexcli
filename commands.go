@@ -139,3 +139,16 @@ func commandInspect(config *config, arguments ...string) error {
 
 	return nil
 }
+
+func commandPokedex(config *config, arguments ...string) error {
+	if len(config.Pokedex) == 0 {
+		return errors.New("No pokemon in pokedex! Get out there and catch them all!")
+	}
+
+	fmt.Println("Your Pokedex:")
+	for _, p := range config.Pokedex {
+		fmt.Printf("- %s\n", p.Name)
+	}
+
+	return nil
+}
